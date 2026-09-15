@@ -1,4 +1,4 @@
-// Publishes a carousel (multiple images) to Instagram, and a single-image post to Threads.
+// Publishes a carousel (multiple images) to both Instagram and Threads.
 import fetch from 'node-fetch';
 
 const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
@@ -75,10 +75,22 @@ async function publishInstagramCarousel(imageUrls, caption) {
   return publishedId;
 }
 
-async function publishThreadsPost(imageUrl, text) {
+async function publishThreadsCarousel(imageUrls, text) {
+  const childIds = [];
+  for (const url of imageUrls) {
+    const { id } = await postJson('https://graph.threads.net/v1.0/me/threads', {
+      media_type: 'IMAGE',
+      image_url: url,
+      is_carousel_item: 'true',
+      access_token: THREADS_TOKEN,
+    });
+    await waitUntilFinished(id, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
+    childIds.push(id);
+  }
+
   const { id: creationId } = await postJson('https://graph.threads.net/v1.0/me/threads', {
-    media_type: 'IMAGE',
-    image_url: imageUrl,
+    media_type: 'CAROUSEL',
+    children: childIds.join(','),
     text,
     access_token: THREADS_TOKEN,
   });
@@ -93,4 +105,4 @@ async function publishThreadsPost(imageUrl, text) {
   return publishedId;
 }
 
-export { publishInstagramCarousel, publishThreadsPost };
+export { publishInstagramCarousel, publishThreadsCarousel };
