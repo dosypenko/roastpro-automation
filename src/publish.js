@@ -28,16 +28,17 @@ async function getJson(url, params) {
   return data;
 }
 
-async function waitUntilFinished(containerId, token, graphHost, apiVersion, maxAttempts = 15) {
+async function waitUntilFinished(containerId, token, graphHost, apiVersion, statusField = 'status_code', maxAttempts = 15) {
   for (let i = 0; i < maxAttempts; i++) {
-    const { status_code } = await getJson(`https://${graphHost}/${apiVersion}/${containerId}`, {
-      fields: 'status_code',
+    const data = await getJson(`https://${graphHost}/${apiVersion}/${containerId}`, {
+      fields: statusField,
       access_token: token,
     });
+    const status = data[statusField];
 
-    if (status_code === 'FINISHED') return;
-    if (status_code === 'ERROR') {
-      throw new Error(`Container ${containerId} failed processing (status: ERROR)`);
+    if (status === 'FINISHED') return;
+    if (status === 'ERROR' || status === 'EXPIRED') {
+      throw new Error(`Container ${containerId} failed processing (status: ${status})`);
     }
 
     await sleep(3000);
@@ -82,7 +83,7 @@ async function publishThreadsPost(imageUrl, text) {
     access_token: THREADS_TOKEN,
   });
 
-  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net', 'v1.0');
+  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
 
   const { id: publishedId } = await postJson('https://graph.threads.net/v1.0/me/threads_publish', {
     creation_id: creationId,
