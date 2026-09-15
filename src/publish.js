@@ -4,6 +4,10 @@ import fetch from 'node-fetch';
 const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
 const THREADS_TOKEN = process.env.THREADS_ACCESS_TOKEN;
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function postJson(url, params) {
   const body = new URLSearchParams(params);
   const res = await fetch(url, { method: 'POST', body });
@@ -14,9 +18,34 @@ async function postJson(url, params) {
   return data;
 }
 
-// --- Instagram carousel ---
+async function getJson(url, params) {
+  const query = new URLSearchParams(params);
+  const res = await fetch(`${url}?${query}`);
+  const data = await res.json();
+  if (data.error) {
+    throw new Error(`API error: ${JSON.stringify(data.error)}`);
+  }
+  return data;
+}
+
+async function waitUntilFinished(containerId, token, graphHost, maxAttempts = 15) {
+  for (let i = 0; i < maxAttempts; i++) {
+    const { status_code } = await getJson(`https://${graphHost}/v21.0/${containerId}`, {
+      fields: 'status_code',
+      access_token: token,
+    });
+
+    if (status_code === 'FINISHED') return;
+    if (status_code === 'ERROR') {
+      throw new Error(`Container ${containerId} failed processing (status: ERROR)`);
+    }
+
+    await sleep(3000);
+  }
+  throw new Error(`Container ${containerId} did not finish processing in time`);
+}
+
 async function publishInstagramCarousel(imageUrls, caption) {
-  // Step 1: create a child container for each image (is_carousel_item=true)
   const childIds = [];
   for (const url of imageUrls) {
     const { id } = await postJson('https://graph.instagram.com/v21.0/me/media', {
@@ -24,10 +53,10 @@ async function publishInstagramCarousel(imageUrls, caption) {
       is_carousel_item: 'true',
       access_token: IG_TOKEN,
     });
+    await waitUntilFinished(id, IG_TOKEN, 'graph.instagram.com');
     childIds.push(id);
   }
 
-  // Step 2: create the parent carousel container
   const { id: creationId } = await postJson('https://graph.instagram.com/v21.0/me/media', {
     media_type: 'CAROUSEL',
     children: childIds.join(','),
@@ -35,7 +64,8 @@ async function publishInstagramCarousel(imageUrls, caption) {
     access_token: IG_TOKEN,
   });
 
-  // Step 3: publish it
+  await waitUntilFinished(creationId, IG_TOKEN, 'graph.instagram.com');
+
   const { id: publishedId } = await postJson('https://graph.instagram.com/v21.0/me/media_publish', {
     creation_id: creationId,
     access_token: IG_TOKEN,
@@ -44,8 +74,6 @@ async function publishInstagramCarousel(imageUrls, caption) {
   return publishedId;
 }
 
-// --- Threads single-image post (Threads carousels follow the same two-step pattern
-// as Instagram if you want to extend this to multiple images later) ---
 async function publishThreadsPost(imageUrl, text) {
   const { id: creationId } = await postJson('https://graph.threads.net/v1.0/me/threads', {
     media_type: 'IMAGE',
@@ -53,6 +81,8 @@ async function publishThreadsPost(imageUrl, text) {
     text,
     access_token: THREADS_TOKEN,
   });
+
+  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net');
 
   const { id: publishedId } = await postJson('https://graph.threads.net/v1.0/me/threads_publish', {
     creation_id: creationId,
