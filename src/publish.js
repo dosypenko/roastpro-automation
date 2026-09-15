@@ -28,9 +28,9 @@ async function getJson(url, params) {
   return data;
 }
 
-async function waitUntilFinished(containerId, token, graphHost, maxAttempts = 15) {
+async function waitUntilFinished(containerId, token, graphHost, apiVersion, maxAttempts = 15) {
   for (let i = 0; i < maxAttempts; i++) {
-    const { status_code } = await getJson(`https://${graphHost}/v21.0/${containerId}`, {
+    const { status_code } = await getJson(`https://${graphHost}/${apiVersion}/${containerId}`, {
       fields: 'status_code',
       access_token: token,
     });
@@ -53,7 +53,7 @@ async function publishInstagramCarousel(imageUrls, caption) {
       is_carousel_item: 'true',
       access_token: IG_TOKEN,
     });
-    await waitUntilFinished(id, IG_TOKEN, 'graph.instagram.com');
+    await waitUntilFinished(id, IG_TOKEN, 'graph.instagram.com', 'v21.0');
     childIds.push(id);
   }
 
@@ -64,7 +64,7 @@ async function publishInstagramCarousel(imageUrls, caption) {
     access_token: IG_TOKEN,
   });
 
-  await waitUntilFinished(creationId, IG_TOKEN, 'graph.instagram.com');
+  await waitUntilFinished(creationId, IG_TOKEN, 'graph.instagram.com', 'v21.0');
 
   const { id: publishedId } = await postJson('https://graph.instagram.com/v21.0/me/media_publish', {
     creation_id: creationId,
@@ -82,7 +82,7 @@ async function publishThreadsPost(imageUrl, text) {
     access_token: THREADS_TOKEN,
   });
 
-  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net');
+  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net', 'v1.0');
 
   const { id: publishedId } = await postJson('https://graph.threads.net/v1.0/me/threads_publish', {
     creation_id: creationId,
