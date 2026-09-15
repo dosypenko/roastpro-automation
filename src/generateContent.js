@@ -18,7 +18,7 @@ You must return ONLY valid JSON (no markdown fences, no commentary) matching thi
   "slide1_hook": { "eyebrow": "...", "headline": "...", "accentWord": "...", "subtext": "..." },
   "slide2_stat": { "eyebrow": "...", "statNumber": "...", "statLabel": "...", "subtext": "..." },
   "slide3_checklist": { "eyebrow": "...", "title": "...", "items": ["...", "...", "..."] },
-  "slide4_cta": { "eyebrow": "...", "headline": "...", "accentWord": "...", "ctaText": "Try RoastPro free" },
+  "slide4_cta": { "eyebrow": "...", "headline": "...", "accentWord": "...", "ctaText": "Link in bio" },
   "caption": "Instagram/Threads caption for this post, 2-4 sentences, ending with a soft call to action. Include 3-5 relevant hashtags at the end."
 }
 
