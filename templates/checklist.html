@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; font-family: 'Inter', sans-serif; overflow: hidden; }
+  .slide {
+    width: 1080px; height: 1080px; position: relative;
+    background: radial-gradient(circle 700px at 50% 20%, #1B2E35 0%, transparent 65%), #0B1416;
+    display: flex; flex-direction: column; padding: 64px 64px 56px;
+  }
+  .top-tag { font-size: 20px; font-weight: 600; letter-spacing: 0.08em; color: #EDEAE2; text-transform: uppercase; }
+  .content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .title { font-family: 'Archivo Black', sans-serif; font-size: 50px; color: #F4F1EA; margin-bottom: 44px; max-width: 800px; }
+  .item { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 34px; }
+  .num {
+    font-family: 'Archivo Black', sans-serif; font-size: 34px; min-width: 56px;
+    background: linear-gradient(135deg, #FFC947 0%, #FF6B35 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .item-text { font-size: 28px; font-weight: 500; color: #D8DDE0; line-height: 1.4; padding-top: 2px; }
+  .footer { display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 24px; font-weight: 700; color: #F4F1EA; }
+  .brand span { background: linear-gradient(135deg, #FFC947 0%, #FF6B35 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .page-dots { display: flex; gap: 10px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2A3A3F; }
+  .dot.active { background: #FF6B35; width: 26px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="top-tag">{{EYEBROW}}</div>
+    <div class="content">
+      <div class="title">{{TITLE}}</div>
+      {{ITEMS_HTML}}
+    </div>
+    <div class="footer">
+      <div class="brand">Roast<span>Pro</span></div>
+      <div class="page-dots">{{DOTS}}</div>
+    </div>
+  </div>
+</body>
+</html>

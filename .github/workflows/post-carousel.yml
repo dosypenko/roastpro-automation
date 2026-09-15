@@ -1,0 +1,30 @@
+name: Post RoastPro carousel
+
+on:
+  schedule:
+    # Runs Tuesday and Thursday at 14:00 UTC (10:00 AM Toronto time, adjust for DST as needed)
+    - cron: '0 14 * * 2,4'
+  workflow_dispatch: {} # allows manual "Run workflow" button in GitHub UI for testing
+
+jobs:
+  post-carousel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run posting pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run run-all

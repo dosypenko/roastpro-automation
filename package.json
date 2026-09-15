@@ -1,0 +1,19 @@
+{
+  "name": "roastpro-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated carousel generation and posting for RoastPro Instagram/Threads",
+  "type": "module",
+  "scripts": {
+    "generate": "node src/generateContent.js",
+    "render": "node src/renderSlides.js",
+    "publish": "node src/publish.js",
+    "run-all": "node src/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "puppeteer": "^23.0.0",
+    "node-fetch": "^3.3.2",
+    "@octokit/rest": "^21.0.0"
+  }
+}
