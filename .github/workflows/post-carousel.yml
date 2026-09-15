@@ -2,9 +2,8 @@ name: Post RoastPro carousel
 
 on:
   schedule:
-    # Runs Tuesday and Thursday at 14:00 UTC (10:00 AM Toronto time, adjust for DST as needed)
     - cron: '0 14 * * 2,4'
-  workflow_dispatch: {} # allows manual "Run workflow" button in GitHub UI for testing
+  workflow_dispatch: {}
 
 jobs:
   post-carousel:
@@ -17,6 +16,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install dependencies
         run: npm install

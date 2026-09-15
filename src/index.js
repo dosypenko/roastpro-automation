@@ -1,35 +1,42 @@
 import { generateCarouselContent } from './generateContent.js';
 import { renderCarousel } from './renderSlides.js';
-import { uploadImages } from './hostImages.js';
-import { publishInstagramCarousel, publishThreadsCarousel } from './publish.js';
+import { renderSlideshowVideo } from './renderVideo.js';
+import { uploadVideo } from './hostImages.js';
+import { publishInstagramReel, publishThreadsVideo } from './publish.js';
 import { getRecentTopics, appendTopic } from './topicHistory.js';
+import path from 'path';
 
 async function main() {
   const runId = new Date().toISOString().replace(/[:.]/g, '-');
   console.log(`Starting run ${runId}`);
 
-  console.log('1/5 Checking recent topics to avoid repeats...');
+  console.log('1/6 Checking recent topics to avoid repeats...');
   const recentTopics = await getRecentTopics();
   console.log(`Found ${recentTopics.length} past topics`);
 
-  console.log('2/5 Generating content with Claude...');
+  console.log('2/6 Generating content with Claude...');
   const content = await generateCarouselContent(recentTopics);
   console.log(`Topic: ${content.topic}`);
 
-  console.log('3/5 Rendering slides to PNG...');
-  const localPaths = await renderCarousel(content, runId);
-  console.log(`Rendered ${localPaths.length} slides`);
+  console.log('3/6 Rendering slides to PNG...');
+  const slidePaths = await renderCarousel(content, runId);
+  console.log(`Rendered ${slidePaths.length} slides`);
 
-  console.log('4/5 Uploading images for public URLs...');
-  const publicUrls = await uploadImages(localPaths, runId);
-  console.log(publicUrls);
+  console.log('4/6 Building slideshow video...');
+  const videoPath = path.join(path.dirname(slidePaths[0]), 'reel.mp4');
+  renderSlideshowVideo(slidePaths, videoPath);
+  console.log(`Video built: ${videoPath}`);
 
-  console.log('5/5 Publishing...');
-  const igPostId = await publishInstagramCarousel(publicUrls, content.caption);
-  console.log(`Instagram published: ${igPostId}`);
+  console.log('5/6 Uploading video for public URL...');
+  const videoUrl = await uploadVideo(videoPath, runId);
+  console.log(videoUrl);
 
-  const threadsPostId = await publishThreadsCarousel(publicUrls, content.caption);
-  console.log(`Threads published: ${threadsPostId}`);
+  console.log('6/6 Publishing...');
+  const igPostId = await publishInstagramReel(videoUrl, content.caption);
+  console.log(`Instagram Reel published: ${igPostId}`);
+
+  const threadsPostId = await publishThreadsVideo(videoUrl, content.caption);
+  console.log(`Threads video published: ${threadsPostId}`);
 
   await appendTopic(content.topic);
 

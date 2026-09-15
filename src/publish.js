@@ -1,4 +1,3 @@
-// Publishes a carousel (multiple images) to both Instagram and Threads.
 import fetch from 'node-fetch';
 
 const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
@@ -28,7 +27,7 @@ async function getJson(url, params) {
   return data;
 }
 
-async function waitUntilFinished(containerId, token, graphHost, apiVersion, statusField = 'status_code', maxAttempts = 15) {
+async function waitUntilFinished(containerId, token, graphHost, apiVersion, statusField = 'status_code', maxAttempts = 30) {
   for (let i = 0; i < maxAttempts; i++) {
     const data = await getJson(`https://${graphHost}/${apiVersion}/${containerId}`, {
       fields: statusField,
@@ -41,26 +40,15 @@ async function waitUntilFinished(containerId, token, graphHost, apiVersion, stat
       throw new Error(`Container ${containerId} failed processing (status: ${status})`);
     }
 
-    await sleep(3000);
+    await sleep(4000);
   }
   throw new Error(`Container ${containerId} did not finish processing in time`);
 }
 
-async function publishInstagramCarousel(imageUrls, caption) {
-  const childIds = [];
-  for (const url of imageUrls) {
-    const { id } = await postJson('https://graph.instagram.com/v21.0/me/media', {
-      image_url: url,
-      is_carousel_item: 'true',
-      access_token: IG_TOKEN,
-    });
-    await waitUntilFinished(id, IG_TOKEN, 'graph.instagram.com', 'v21.0');
-    childIds.push(id);
-  }
-
+async function publishInstagramReel(videoUrl, caption) {
   const { id: creationId } = await postJson('https://graph.instagram.com/v21.0/me/media', {
-    media_type: 'CAROUSEL',
-    children: childIds.join(','),
+    media_type: 'REELS',
+    video_url: videoUrl,
     caption,
     access_token: IG_TOKEN,
   });
@@ -75,22 +63,10 @@ async function publishInstagramCarousel(imageUrls, caption) {
   return publishedId;
 }
 
-async function publishThreadsCarousel(imageUrls, text) {
-  const childIds = [];
-  for (const url of imageUrls) {
-    const { id } = await postJson('https://graph.threads.net/v1.0/me/threads', {
-      media_type: 'IMAGE',
-      image_url: url,
-      is_carousel_item: 'true',
-      access_token: THREADS_TOKEN,
-    });
-    await waitUntilFinished(id, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
-    childIds.push(id);
-  }
-
+async function publishThreadsVideo(videoUrl, text) {
   const { id: creationId } = await postJson('https://graph.threads.net/v1.0/me/threads', {
-    media_type: 'CAROUSEL',
-    children: childIds.join(','),
+    media_type: 'VIDEO',
+    video_url: videoUrl,
     text,
     access_token: THREADS_TOKEN,
   });
@@ -105,4 +81,4 @@ async function publishThreadsCarousel(imageUrls, text) {
   return publishedId;
 }
 
-export { publishInstagramCarousel, publishThreadsCarousel };
+export { publishInstagramReel, publishThreadsVideo };

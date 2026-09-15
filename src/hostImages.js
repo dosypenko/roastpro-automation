@@ -1,11 +1,3 @@
-// Instagram/Threads require a publicly reachable image URL - they fetch it themselves,
-// they can't accept raw file uploads. Since this runs in a throwaway GitHub Actions
-// container, the simplest free hosting is: commit the rendered PNGs straight into this
-// same repo (must be a PUBLIC repo) and reference them via raw.githubusercontent.com.
-//
-// If you'd rather not make the repo public, swap this file for an upload to any
-// object storage you control (Vercel Blob, S3, Cloudinary, imgur API, etc.) and
-// return the resulting public URLs in the same shape.
 import fs from 'fs';
 import { Octokit } from '@octokit/rest';
 
@@ -20,7 +12,6 @@ async function ensureBranchExists() {
     await octokit.repos.getBranch({ owner: OWNER, repo: REPO, branch: BRANCH });
   } catch (err) {
     if (err.status !== 404) throw err;
-    // Branch doesn't exist yet - create it from the default branch's current commit.
     const { data: repoData } = await octokit.repos.get({ owner: OWNER, repo: REPO });
     const { data: ref } = await octokit.git.getRef({
       owner: OWNER,
@@ -36,27 +27,33 @@ async function ensureBranchExists() {
   }
 }
 
-async function uploadImages(localPaths, runId) {
+async function uploadFile(localPath, repoPath) {
   await ensureBranchExists();
+  const content = fs.readFileSync(localPath).toString('base64');
+
+  await octokit.repos.createOrUpdateFileContents({
+    owner: OWNER,
+    repo: REPO,
+    path: repoPath,
+    message: `Add generated media: ${repoPath}`,
+    content,
+    branch: BRANCH,
+  });
+
+  return `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${repoPath}`;
+}
+
+async function uploadImages(localPaths, runId) {
   const urls = [];
-
   for (let i = 0; i < localPaths.length; i++) {
-    const content = fs.readFileSync(localPaths[i]).toString('base64');
-    const repoPath = `media/${runId}/slide-${i + 1}.png`;
-
-    await octokit.repos.createOrUpdateFileContents({
-      owner: OWNER,
-      repo: REPO,
-      path: repoPath,
-      message: `Add carousel media for run ${runId}`,
-      content,
-      branch: BRANCH,
-    });
-
-    urls.push(`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${repoPath}`);
+    const url = await uploadFile(localPaths[i], `media/${runId}/slide-${i + 1}.png`);
+    urls.push(url);
   }
-
   return urls;
 }
 
-export { uploadImages };
+async function uploadVideo(localPath, runId) {
+  return uploadFile(localPath, `media/${runId}/reel.mp4`);
+}
+
+export { uploadImages, uploadVideo };
