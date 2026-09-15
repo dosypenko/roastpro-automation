@@ -47,7 +47,9 @@ async function generateCarouselContent(recentTopics = []) {
     ],
   });
 
-  const text = message.content[0].text.trim();
+  let text = message.content[0].text.trim();
+  // Strip markdown code fences if Claude wrapped the JSON in them
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
   return JSON.parse(text);
 }
 
