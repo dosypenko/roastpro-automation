@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0B1416; }
+  body { font-family: 'Inter', 'Inter Display', sans-serif; position: relative; }
+
+  #bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle 900px at 50% 28%, #1B2E35 0%, transparent 65%),
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 80px 80px,
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 80px 80px,
+      #0B1416;
+  }
+  #glow {
+    position: absolute; width: 900px; height: 900px; border-radius: 50%;
+    left: 90px; top: 520px;
+    background: radial-gradient(circle, rgba(255,107,53,0.20) 0%, transparent 65%);
+  }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .grad {
+    background: linear-gradient(135deg, #FFC947 0%, #FF6B35 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .eyebrow {
+    position: absolute; left: 70px; top: 330px;
+    font-size: 30px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #FF6B35;
+  }
+  .headline {
+    position: absolute; left: 70px; right: 70px; top: 640px;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 108px; line-height: 1.08; color: #F4F1EA;
+  }
+  .word { display: inline-block; margin-right: 0.22em; opacity: 0; will-change: transform, opacity; }
+
+  /* stat scene */
+  #ring { position: absolute; left: 230px; top: 440px; width: 620px; height: 620px; }
+  #statNumber {
+    position: absolute; left: 0; right: 0; top: 650px; text-align: center;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 190px; line-height: 1;
+  }
+  #statLabel {
+    position: absolute; left: 110px; right: 110px; top: 1120px; text-align: center;
+    font-size: 40px; font-weight: 700; color: #F4F1EA; line-height: 1.3;
+  }
+
+  /* checklist scene */
+  .title {
+    position: absolute; left: 70px; right: 70px; top: 400px;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 80px; line-height: 1.1; color: #F4F1EA;
+  }
+  .item {
+    position: absolute; left: 70px; right: 70px; height: 190px; opacity: 0;
+    background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.10); border-radius: 28px;
+    display: flex; align-items: center; padding: 0 40px; gap: 34px;
+    font-size: 38px; font-weight: 700; color: #F4F1EA; line-height: 1.25;
+  }
+  .badge {
+    flex: none; width: 82px; height: 82px; border-radius: 50%;
+    background: linear-gradient(135deg, #FFC947, #FF6B35);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 44px; color: #0B1416;
+  }
+
+  /* CTA scene */
+  #brand {
+    position: absolute; left: 0; right: 0; top: 380px; text-align: center;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 130px; color: #F4F1EA;
+  }
+  #ctaHeadline {
+    position: absolute; left: 90px; right: 90px; top: 560px; text-align: center;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 76px; line-height: 1.12; color: #F4F1EA;
+  }
+  #button {
+    position: absolute; left: 130px; right: 130px; top: 960px; height: 150px; border-radius: 75px;
+    background: linear-gradient(135deg, #FFC947, #FF6B35);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Archivo Black', 'Inter Black', 'Inter', sans-serif; font-size: 52px; color: #0B1416;
+  }
+  #url {
+    position: absolute; left: 0; right: 0; top: 1160px; text-align: center;
+    font-size: 54px; font-weight: 800; color: #FF6B35;
+  }
+  #price {
+    position: absolute; left: 0; right: 0; top: 1250px; text-align: center;
+    font-size: 34px; font-weight: 600; color: #9BA8AC;
+  }
+
+  /* captions */
+  #caption {
+    position: absolute; left: 70px; right: 70px; top: 1340px; text-align: center; opacity: 0;
+    font-size: 50px; font-weight: 800; line-height: 1.3; color: #F4F1EA;
+  }
+  #caption .cw { display: inline-block; margin: 0 0.12em; padding: 2px 10px; border-radius: 12px; opacity: 0; }
+  #caption .cw.now { background: linear-gradient(135deg, #FFC947, #FF6B35); color: #0B1416; }
+
+  #progress { position: absolute; left: 0; top: 0; height: 8px; background: linear-gradient(90deg, #FFC947, #FF6B35); width: 0; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="glow"></div>
+<div id="progress"></div>
+
+<div class="scene" id="s1">
+  <div class="eyebrow" id="s1Eyebrow" style="top:560px"></div>
+  <div class="headline" id="s1Headline"></div>
+</div>
+
+<div class="scene" id="s2">
+  <div class="eyebrow" id="s2Eyebrow" style="top:340px"></div>
+  <svg id="ring" viewBox="0 0 700 700">
+    <circle cx="350" cy="350" r="320" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="26"/>
+    <circle id="ringArc" cx="350" cy="350" r="320" fill="none" stroke="url(#g)" stroke-width="26"
+            stroke-linecap="round" transform="rotate(-90 350 350)" stroke-dasharray="2010.6" stroke-dashoffset="2010.6"/>
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFC947"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+  </svg>
+  <div id="statNumber" class="grad"></div>
+  <div id="statLabel"></div>
+</div>
+
+<div class="scene" id="s3">
+  <div class="eyebrow" id="s3Eyebrow" style="top:290px"></div>
+  <div class="title" id="s3Title" style="top:350px"></div>
+  <div id="items"></div>
+</div>
+
+<div class="scene" id="s4">
+  <div id="brand">Roast<span class="grad">Pro</span></div>
+  <div id="ctaHeadline"></div>
+  <div id="button">Try 1 free roast</div>
+  <div id="url">roastpro.ca</div>
+  <div id="price">$4 one-time &middot; no subscription</div>
+</div>
+
+<div id="caption"></div>
+
+<script>
+  const C = window.__CONTENT__;
+  const W = 1080;
+  // Scene timeline in seconds.
+  const T = { s1: [0, 4.6], s2: [4.6, 9.8], s3: [9.8, 16.2], s4: [16.2, 21] };
+  window.TOTAL_SECONDS = 21;
+
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const easeOut = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const easeBack = (x) => { x = clamp(x); const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+
+  function esc(s) { return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+
+  // Splits a headline into word spans; the accent phrase is colored.
+  function wordsHtml(text, accent) {
+    let marked = esc(text);
+    if (accent) {
+      const re = new RegExp('(' + esc(accent).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i');
+      marked = marked.replace(re, '\u0001$1\u0002');
+    }
+    let inAccent = false, out = '';
+    marked.split(/\s+/).forEach((w) => {
+      if (w.includes('\u0001')) inAccent = true;
+      const clean = w.replace(/[\u0001\u0002]/g, '');
+      out += '<span class="word' + (inAccent ? ' grad' : '') + '">' + clean + '</span> ';
+      if (w.includes('\u0002')) inAccent = false;
+    });
+    return out;
+  }
+
+  // Build DOM from content.
+  const s1 = C.slide1_hook, s2 = C.slide2_stat, s3 = C.slide3_checklist, s4 = C.slide4_cta;
+  document.getElementById('s1Eyebrow').textContent = s1.eyebrow;
+  document.getElementById('s1Headline').innerHTML = wordsHtml(s1.headline, s1.accentWord);
+  document.getElementById('s2Eyebrow').textContent = s2.eyebrow;
+  document.getElementById('statLabel').textContent = s2.statLabel;
+  document.getElementById('s3Eyebrow').textContent = s3.eyebrow;
+  document.getElementById('s3Title').textContent = s3.title;
+  document.getElementById('ctaHeadline').innerHTML = wordsHtml(s4.headline, s4.accentWord);
+
+  const itemsEl = document.getElementById('items');
+  s3.items.slice(0, 3).forEach((txt, i) => {
+    const d = document.createElement('div');
+    d.className = 'item';
+    d.style.top = (640 + i * 220) + 'px';
+    d.innerHTML = '<div class="badge">' + (i + 1) + '</div><div>' + esc(txt) + '</div>';
+    itemsEl.appendChild(d);
+  });
+
+  // Stat number: count up when the value starts with a number.
+  const statRaw = String(s2.statNumber);
+  const m = statRaw.match(/^([^\d]*)([\d.,]+)(.*)$/);
+  const statTarget = m ? parseFloat(m[2].replace(/,/g, '')) : null;
+  const statDecimals = m && m[2].includes('.') ? (m[2].split('.')[1] || '').length : 0;
+  const statFontSize = statRaw.length > 9 ? 100 : statRaw.length > 4 ? 120 : 190;
+  document.getElementById('statNumber').style.fontSize = statFontSize + 'px';
+
+  // Captions: each scene narrates one line, revealed word by word.
+  const CAPTIONS = [
+    { text: s1.subtext, scene: T.s1 },
+    { text: s2.subtext, scene: T.s2 },
+    { text: 'First roast free', scene: T.s4 },
+  ];
+  const capEl = document.getElementById('caption');
+  capEl.innerHTML = '';
+  const capWords = []; // {el, start, end, sceneStart, sceneEnd}
+  CAPTIONS.forEach((c) => {
+    const words = String(c.text).split(/\s+/).filter(Boolean);
+    const span = Math.min(2.6, (c.scene[1] - c.scene[0]) - 1.1);
+    const start = c.scene[0] + 0.7;
+    words.forEach((w, i) => {
+      const el = document.createElement('span');
+      el.className = 'cw';
+      el.textContent = w;
+      el.style.display = 'none';
+      capEl.appendChild(el);
+      capWords.push({ el, t: start + (i / words.length) * span, next: start + ((i + 1) / words.length) * span, scene: c.scene });
+    });
+  });
+
+  function sceneAlpha(range, t) {
+    const [a, b] = range;
+    if (t < a || t >= b) return 0;
+    const fadeIn = clamp((t - a) / 0.3);
+    const fadeOut = b >= window.TOTAL_SECONDS ? 1 : clamp((b - t) / 0.3);
+    return Math.min(fadeIn, fadeOut);
+  }
+
+  function popWords(container, t, t0, stagger) {
+    container.querySelectorAll('.word').forEach((w, i) => {
+      const p = clamp((t - t0 - i * stagger) / 0.45);
+      w.style.opacity = easeOut(p * 1.6);
+      const sc = 0.6 + 0.4 * easeBack(p);
+      w.style.transform = 'translateY(' + (1 - easeOut(p)) * 50 + 'px) scale(' + sc + ')';
+    });
+  }
+
+  window.renderAt = function (t) {
+    document.getElementById('progress').style.width = (t / window.TOTAL_SECONDS * W) + 'px';
+    // gentle glow drift
+    document.getElementById('glow').style.transform = 'translate(' + Math.sin(t * 0.6) * 60 + 'px,' + Math.cos(t * 0.5) * 80 + 'px)';
+
+    // Scene 1
+    const a1 = sceneAlpha(T.s1, t);
+    document.getElementById('s1').style.opacity = a1;
+    if (a1 > 0) {
+      const eb = document.getElementById('s1Eyebrow');
+      eb.style.opacity = easeOut((t - 0.1) / 0.4);
+      popWords(document.getElementById('s1Headline'), t, 0.35, 0.16);
+    }
+
+    // Scene 2
+    const a2 = sceneAlpha(T.s2, t);
+    document.getElementById('s2').style.opacity = a2;
+    if (a2 > 0) {
+      const lt = t - T.s2[0];
+      const p = easeOut(lt / 1.4);
+      document.getElementById('ringArc').setAttribute('stroke-dashoffset', 2010.6 * (1 - 0.82 * p));
+      const num = document.getElementById('statNumber');
+      if (statTarget !== null) {
+        const v = statTarget * p;
+        num.textContent = m[1] + v.toFixed(statDecimals) + m[3];
+      } else {
+        num.textContent = statRaw;
+      }
+      const sc = 0.85 + 0.15 * easeBack(lt / 0.7);
+      num.style.transform = 'scale(' + sc + ')';
+      document.getElementById('statLabel').style.opacity = easeOut((lt - 0.9) / 0.5);
+    }
+
+    // Scene 3
+    const a3 = sceneAlpha(T.s3, t);
+    document.getElementById('s3').style.opacity = a3;
+    if (a3 > 0) {
+      const lt = t - T.s3[0];
+      document.getElementById('s3Title').style.opacity = easeOut(lt / 0.4);
+      document.querySelectorAll('.item').forEach((el, i) => {
+        const p = clamp((lt - 0.7 - i * 1.0) / 0.5);
+        el.style.opacity = easeOut(p * 1.5);
+        el.style.transform = 'translateX(' + (1 - easeOut(p)) * 260 + 'px)';
+      });
+    }
+
+    // Scene 4
+    const a4 = sceneAlpha(T.s4, t);
+    document.getElementById('s4').style.opacity = a4;
+    if (a4 > 0) {
+      const lt = t - T.s4[0];
+      document.getElementById('brand').style.opacity = easeOut(lt / 0.4);
+      popWords(document.getElementById('ctaHeadline'), t, T.s4[0] + 0.5, 0.12);
+      const bp = clamp((lt - 1.4) / 0.5);
+      const pulse = 1 + 0.03 * Math.sin(lt * 6);
+      const btn = document.getElementById('button');
+      btn.style.opacity = easeOut(bp * 1.5);
+      btn.style.transform = 'scale(' + (0.8 + 0.2 * easeBack(bp)) * (bp >= 1 ? pulse : 1) + ')';
+      document.getElementById('url').style.opacity = easeOut((lt - 1.9) / 0.4);
+      document.getElementById('price').style.opacity = easeOut((lt - 2.2) / 0.4);
+    }
+
+    // Captions (word-by-word, current word highlighted)
+    let any = false;
+    capWords.forEach((w) => {
+      const inScene = t >= w.scene[0] && t < w.scene[1] - 0.3;
+      const shown = inScene && t >= w.t;
+      w.el.style.display = inScene ? 'inline-block' : 'none';
+      w.el.style.opacity = shown ? 1 : 0;
+      w.el.classList.toggle('now', shown && t < w.next + 0.25);
+      if (inScene) any = true;
+    });
+    capEl.style.opacity = any ? 1 : 0;
+  };
+  window.renderAt(0);
+</script>
+</body>
+</html>

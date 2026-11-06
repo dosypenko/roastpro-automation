@@ -81,4 +81,59 @@ async function publishThreadsVideo(videoUrl, text) {
   return publishedId;
 }
 
-export { publishInstagramReel, publishThreadsVideo };
+async function publishInstagramCarousel(imageUrls, caption) {
+  const childIds = [];
+  for (const imageUrl of imageUrls) {
+    const { id } = await postJson('https://graph.instagram.com/v21.0/me/media', {
+      image_url: imageUrl,
+      is_carousel_item: 'true',
+      access_token: IG_TOKEN,
+    });
+    await waitUntilFinished(id, IG_TOKEN, 'graph.instagram.com', 'v21.0');
+    childIds.push(id);
+  }
+
+  const { id: creationId } = await postJson('https://graph.instagram.com/v21.0/me/media', {
+    media_type: 'CAROUSEL',
+    children: childIds.join(','),
+    caption,
+    access_token: IG_TOKEN,
+  });
+  await waitUntilFinished(creationId, IG_TOKEN, 'graph.instagram.com', 'v21.0');
+
+  const { id: publishedId } = await postJson('https://graph.instagram.com/v21.0/me/media_publish', {
+    creation_id: creationId,
+    access_token: IG_TOKEN,
+  });
+  return publishedId;
+}
+
+async function publishThreadsCarousel(imageUrls, text) {
+  const childIds = [];
+  for (const imageUrl of imageUrls) {
+    const { id } = await postJson('https://graph.threads.net/v1.0/me/threads', {
+      media_type: 'IMAGE',
+      image_url: imageUrl,
+      is_carousel_item: 'true',
+      access_token: THREADS_TOKEN,
+    });
+    await waitUntilFinished(id, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
+    childIds.push(id);
+  }
+
+  const { id: creationId } = await postJson('https://graph.threads.net/v1.0/me/threads', {
+    media_type: 'CAROUSEL',
+    children: childIds.join(','),
+    text,
+    access_token: THREADS_TOKEN,
+  });
+  await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
+
+  const { id: publishedId } = await postJson('https://graph.threads.net/v1.0/me/threads_publish', {
+    creation_id: creationId,
+    access_token: THREADS_TOKEN,
+  });
+  return publishedId;
+}
+
+export { publishInstagramReel, publishThreadsVideo, publishInstagramCarousel, publishThreadsCarousel };

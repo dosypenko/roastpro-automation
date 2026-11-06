@@ -46,7 +46,8 @@ async function uploadFile(localPath, repoPath) {
 async function uploadImages(localPaths, runId) {
   const urls = [];
   for (let i = 0; i < localPaths.length; i++) {
-    const url = await uploadFile(localPaths[i], `media/${runId}/slide-${i + 1}.png`);
+    const ext = localPaths[i].split('.').pop();
+    const url = await uploadFile(localPaths[i], `media/${runId}/slide-${i + 1}.${ext}`);
     urls.push(url);
   }
   return urls;
