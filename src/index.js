@@ -32,10 +32,14 @@ async function main() {
   console.log(videoUrl);
 
   console.log('6/6 Publishing...');
-  const igPostId = await publishInstagramReel(videoUrl, content.caption);
+  const igCaption = `${content.caption}\n\nFirst roast free, link in bio \u{1F447}\n$4 one-time, no subscription.`;
+  // Links are clickable on Threads but not in Instagram captions.
+  const threadsText = `${content.caption.slice(0, 440)}\n\nFirst roast free: https://roastpro.ca`;
+
+  const igPostId = await publishInstagramReel(videoUrl, igCaption);
   console.log(`Instagram Reel published: ${igPostId}`);
 
-  const threadsPostId = await publishThreadsVideo(videoUrl, content.caption);
+  const threadsPostId = await publishThreadsVideo(videoUrl, threadsText);
   console.log(`Threads video published: ${threadsPostId}`);
 
   await appendTopic(content.topic);

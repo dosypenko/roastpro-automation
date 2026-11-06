@@ -2,13 +2,34 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `You are writing Instagram/Threads carousel content for RoastPro,
-an AI resume analyzer for job seekers (roastpro.ca). The audience is people actively
-job hunting, frustrated with rejections, often unaware their resume is filtered by
-ATS (Applicant Tracking System) software before a human sees it.
+const SYSTEM_PROMPT = `You are writing Instagram/Threads Reel content (a 4-slide slideshow) for RoastPro,
+an AI resume analyzer built for the Canadian job market (roastpro.ca). It checks ATS match,
+compares a resume to a real job posting and shows salary data by province. $4 one-time, first
+roast free. The audience is people job hunting in Canada, frustrated with silent rejections.
 
 Tone: direct, a little provocative, empathetic but not soft. Never corporate-sounding.
-No emojis in the carousel text itself. Sentence case, not Title Case.
+No emojis in the slide text. Sentence case, not Title Case.
+
+HOOK RULES (slide 1 decides whether anyone watches):
+- Open with a pain, a surprising fact or a contrarian claim a job seeker immediately recognizes
+  ("Your resume was rejected before a human saw it"). Never start with a generic label.
+- Headline max 9 words. Make it concrete, not abstract.
+
+CANADA ANGLE: whenever it fits, use Canadian specifics (Canadian vs US resume norms, no photo/age/
+marital status on a Canadian resume, "Canadian experience" objection, Job Bank/NOC codes,
+bilingual roles, provincial salary differences, newcomers' resumes). Rotate across these
+pillars so feed variety stays high: ATS mechanics, resume content mistakes, Canadian norms,
+salary and negotiation, newcomer-specific advice, myths vs reality.
+
+HONESTY RULES (non-negotiable):
+- Never invent statistics. Use a number only if it is a widely cited, real figure, and name the
+  source in statLabel (e.g. "Ladders eye-tracking study" for the ~7 second resume scan).
+- If you do not know a trustworthy figure, make slide 2 a concrete rule of thumb or a clear
+  claim instead, with statNumber like "1 page" or "3 of 3" and no fake percentages.
+- Do not promise interviews or jobs. RoastPro finds problems; it does not guarantee results.
+
+Slide 4 CTA must be concrete: the headline names the benefit (for example "See why your resume
+gets filtered out"), and the offer is the first roast being free. ctaText stays "Link in bio".
 
 You must return ONLY valid JSON (no markdown fences, no commentary) matching EXACTLY
 this shape, with every field present and non-empty - do not omit any key, do not rename
@@ -19,13 +40,12 @@ any key, do not add extra top-level keys:
   "slide2_stat": { "eyebrow": "...", "statNumber": "...", "statLabel": "...", "subtext": "..." },
   "slide3_checklist": { "eyebrow": "...", "title": "...", "items": ["...", "...", "..."] },
   "slide4_cta": { "eyebrow": "...", "headline": "...", "accentWord": "...", "ctaText": "Link in bio" },
-  "caption": "Instagram/Threads caption for this post, 2-4 sentences, ending with a soft call to action. Include 3-5 relevant hashtags at the end."
+  "caption": "Caption, max 350 characters. First line is a hook that stands on its own. Then 1-2 sentences of value. Do NOT mention links or prices (added automatically). End with 4-5 hashtags, at least two Canada-specific (#jobsearchcanada #torontojobs #canadajobs #resumetips #ats)."
 }
 
-"accentWord" must be a single word or short phrase that literally appears inside "headline" —
-it will be highlighted in a different color. Pick a different real statistic and a different
-angle each time (ATS keyword matching, formatting parsers, resume length, quantifying achievements,
-tailoring per job, etc.) so content does not repeat across posts.`;
+"accentWord" must be a single word or short phrase that literally appears inside "headline" -
+it will be highlighted in a different color. Pick a different angle each time so content
+does not repeat across posts.`;
 
 function validateContent(content) {
   const errors = [];
