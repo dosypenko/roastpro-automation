@@ -50,6 +50,8 @@ async function publishInstagramReel(videoUrl, caption) {
     media_type: 'REELS',
     video_url: videoUrl,
     caption,
+    // Use a frame where the hook headline is fully on screen as the cover (ms).
+    thumb_offset: '2800',
     access_token: IG_TOKEN,
   });
 

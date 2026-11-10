@@ -223,7 +223,7 @@
   function sceneAlpha(range, t) {
     const [a, b] = range;
     if (t < a || t >= b) return 0;
-    const fadeIn = clamp((t - a) / 0.3);
+    const fadeIn = a === 0 ? 1 : clamp((t - a) / 0.3);
     const fadeOut = b >= window.TOTAL_SECONDS ? 1 : clamp((b - t) / 0.3);
     return Math.min(fadeIn, fadeOut);
   }
@@ -247,8 +247,8 @@
     document.getElementById('s1').style.opacity = a1;
     if (a1 > 0) {
       const eb = document.getElementById('s1Eyebrow');
-      eb.style.opacity = easeOut((t - 0.1) / 0.4);
-      popWords(document.getElementById('s1Headline'), t, 0.35, 0.16);
+      eb.style.opacity = 1;
+      popWords(document.getElementById('s1Headline'), t, 0.05, 0.1);
     }
 
     // Scene 2
