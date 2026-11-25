@@ -7,6 +7,22 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Meta sometimes reports a container as FINISHED but still answers "media not found" (code 24 /
+// subcode 4279009) or "not ready" for a short while. Retry those, fail fast on anything else.
+async function retryNotReady(fn, { attempts = 6, delayMs = 10000 } = {}) {
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const msg = String(err.message);
+      const notReady = /4279009|2207027|9007|cannot be found|not available|not ready/i.test(msg);
+      if (!notReady || i >= attempts) throw err;
+      console.log(`Not ready yet (attempt ${i}/${attempts}), waiting ${delayMs / 1000}s...`);
+      await sleep(delayMs);
+    }
+  }
+}
+
 async function postJson(url, params) {
   const body = new URLSearchParams(params);
   const res = await fetch(url, { method: 'POST', body });
@@ -130,11 +146,14 @@ async function publishThreadsCarousel(imageUrls, text) {
     access_token: THREADS_TOKEN,
   });
   await waitUntilFinished(creationId, THREADS_TOKEN, 'graph.threads.net', 'v1.0', 'status');
+  // Threads recommends waiting ~30s before publishing a carousel container.
+  await sleep(30000);
 
-  const { id: publishedId } = await postJson('https://graph.threads.net/v1.0/me/threads_publish', {
-    creation_id: creationId,
-    access_token: THREADS_TOKEN,
-  });
+  const { id: publishedId } = await retryNotReady(() =>
+    postJson('https://graph.threads.net/v1.0/me/threads_publish', {
+      creation_id: creationId,
+      access_token: THREADS_TOKEN,
+    }));
   return publishedId;
 }
 

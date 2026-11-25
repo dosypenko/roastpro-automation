@@ -41,6 +41,7 @@ async function main() {
   const content = await generateCarouselContent(recentTopics);
   console.log(`Topic: ${content.topic}`);
 
+  let threadsError = null;
   const format = pickFormat();
   console.log(`Format today: ${format}`);
 
@@ -64,8 +65,13 @@ async function main() {
     const igPostId = await publishInstagramReel(videoUrl, igCaption);
     console.log(`Instagram Reel published: ${igPostId}`);
 
-    const threadsPostId = await publishThreadsVideo(videoUrl, threadsText);
-    console.log(`Threads video published: ${threadsPostId}`);
+    try {
+      const threadsPostId = await publishThreadsVideo(videoUrl, threadsText);
+      console.log(`Threads video published: ${threadsPostId}`);
+    } catch (err) {
+      threadsError = err;
+      console.error('Threads publishing failed (Instagram already published):', err.message);
+    }
   } else {
     console.log('3/6 Rendering slides to PNG...');
     const slidePaths = await renderCarousel(content, runId);
@@ -82,12 +88,19 @@ async function main() {
     const igPostId = await publishInstagramCarousel(imageUrls, igCaption);
     console.log(`Instagram carousel published: ${igPostId}`);
 
-    const threadsPostId = await publishThreadsCarousel(imageUrls, threadsText);
-    console.log(`Threads carousel published: ${threadsPostId}`);
+    try {
+      const threadsPostId = await publishThreadsCarousel(imageUrls, threadsText);
+      console.log(`Threads carousel published: ${threadsPostId}`);
+    } catch (err) {
+      threadsError = err;
+      console.error('Threads publishing failed (Instagram already published):', err.message);
+    }
   }
 
+  // Instagram succeeded, so the topic is used even if Threads failed.
   await appendTopic(content.topic);
 
+  if (threadsError) throw new Error(`Threads failed: ${threadsError.message}`);
   console.log('Done.');
 }
 
